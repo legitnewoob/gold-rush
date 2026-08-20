@@ -5,7 +5,7 @@ Scrapes current gold rates and the recent rate-history table from
 https://www.tanishq.co.in/gold-rate.html
 
 Usage:
-    pip install requests beautifulsoup4 pandas lxml
+    pip install requests beautifulsoup4 lxml
     python tanishq_gold_scraper.py
 
 Notes:
@@ -26,7 +26,6 @@ from datetime import datetime, timezone
 
 import requests
 from bs4 import BeautifulSoup
-import pandas as pd
 
 URL = "https://www.tanishq.co.in/gold-rate.html?lang=en_IN"
 
