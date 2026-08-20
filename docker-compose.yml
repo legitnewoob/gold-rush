@@ -1,0 +1,10 @@
+services:
+  gold-rush:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      PYTHON_BIN: python3
+      DATA_DIR: /app/data
+    volumes:
+      - ./data:/app/data

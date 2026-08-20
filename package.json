@@ -1,0 +1,14 @@
+{
+  "name": "gold-rush-telegram-bot",
+  "version": "1.0.0",
+  "description": "Telegram bot that posts Tanishq gold rates every day.",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "send-now": "node index.js --send-now",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
