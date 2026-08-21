@@ -21,3 +21,26 @@ export async function sendTelegramMessage({ token, chatId, text }) {
 
   return payload.result;
 }
+
+export async function sendTelegramPhoto({ token, chatId, photoUrl, caption }) {
+  const response = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
+    method: "POST",
+    headers: {
+      "content-type": "application/json",
+    },
+    body: JSON.stringify({
+      chat_id: chatId,
+      photo: photoUrl,
+      ...(caption ? { caption, parse_mode: "HTML" } : {}),
+    }),
+  });
+
+  const payload = await response.json().catch(() => null);
+
+  if (!response.ok || !payload?.ok) {
+    const description = payload?.description || `HTTP ${response.status}`;
+    throw new Error(`Telegram photo send failed: ${description}`);
+  }
+
+  return payload.result;
+}

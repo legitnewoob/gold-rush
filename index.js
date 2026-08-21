@@ -11,7 +11,8 @@ import { buildCombinedTelegramMessage } from "./src/message.js";
 import { startDailyScheduler } from "./src/scheduler.js";
 import { buildSummary } from "./src/summary.js";
 import { fetchTanishqRates } from "./src/tanishq.js";
-import { sendTelegramMessage } from "./src/telegram.js";
+import { sendTelegramMessage, sendTelegramPhoto } from "./src/telegram.js";
+import { buildLineChartUrl } from "./src/chart.js";
 
 loadEnvFile();
 
@@ -34,15 +35,30 @@ async function fetchAndSaveVariant(variant) {
 
   saveStoredHistory(dataFile, mergedHistory);
 
-  return buildSummary({
+  const sortedEntries = toSortedEntries(mergedHistory);
+
+  const summary = buildSummary({
     currentSnapshot: snapshot,
-    historyEntries: toSortedEntries(mergedHistory),
+    historyEntries: sortedEntries,
     timezone: config.timezone,
   });
+
+  return { summary, entries: sortedEntries };
 }
 
 async function runOnce() {
-  const summaries = await Promise.all(config.variants.map(fetchAndSaveVariant));
+  const results = await Promise.all(config.variants.map(fetchAndSaveVariant));
+  const summaries = results.map((r) => r.summary);
+
+  const chartUrl = buildLineChartUrl({
+    series: results.map((r) => ({ label: `${r.summary.variant}K`, entries: r.entries })),
+    days: 30,
+  });
+  await sendTelegramPhoto({
+    token: config.telegramBotToken,
+    chatId: config.telegramChatId,
+    photoUrl: chartUrl,
+  });
 
   const message = buildCombinedTelegramMessage(summaries);
   await sendTelegramMessage({
@@ -52,7 +68,7 @@ async function runOnce() {
   });
 
   const date = summaries[0].formatDateShort(summaries[0].date);
-  console.log(`Sent Telegram message for ${date} (${config.variants.join("K, ")}K).`);
+  console.log(`Sent Telegram chart and message for ${date} (${config.variants.join("K, ")}K).`);
 }
 
 async function main() {
