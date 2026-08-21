@@ -1,4 +1,18 @@
-const SERIES_COLORS = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"];
+// Dark-surface categorical steps (validated pair) from the dataviz palette.
+const SERIES_COLORS = ["#3987e5", "#d95926", "#199e70", "#c98500"];
+const SURFACE = "#161616";
+const GRID_COLOR = "rgba(255,255,255,0.07)";
+const AXIS_LABEL_COLOR = "#8a897f";
+const TITLE_COLOR = "#f5f5f0";
+const LEGEND_LABEL_COLOR = "#c3c2b7";
+
+function hexToRgba(hex, alpha) {
+  const value = hex.replace("#", "");
+  const r = Number.parseInt(value.slice(0, 2), 16);
+  const g = Number.parseInt(value.slice(2, 4), 16);
+  const b = Number.parseInt(value.slice(4, 6), 16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
 
 function formatAxisDate(isoDate) {
   const [, month, day] = isoDate.split("-");
@@ -26,16 +40,18 @@ export function buildLineChartUrl({ series, days = 30, width = 800, height = 400
 
   const datasets = windowed.map((s, i) => {
     const rateByDate = new Map(s.entries.map((e) => [e.date, e.rate]));
+    const color = SERIES_COLORS[i % SERIES_COLORS.length];
     return {
       label: s.label,
       data: labels.map((date) => rateByDate.get(date) ?? null),
-      borderColor: SERIES_COLORS[i % SERIES_COLORS.length],
-      backgroundColor: SERIES_COLORS[i % SERIES_COLORS.length],
-      fill: false,
+      borderColor: color,
+      backgroundColor: hexToRgba(color, 0.18),
+      fill: true,
       spanGaps: true,
-      tension: 0.2,
-      pointRadius: 2,
-      borderWidth: 2,
+      tension: 0.35,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      borderWidth: 2.5,
     };
   });
 
@@ -46,21 +62,37 @@ export function buildLineChartUrl({ series, days = 30, width = 800, height = 400
       datasets,
     },
     options: {
+      layout: { padding: 16 },
       title: {
         display: true,
         text: `Gold Rate — Last ${days} Days`,
+        fontColor: TITLE_COLOR,
+        fontSize: 18,
+        fontStyle: "bold",
+        padding: 16,
       },
       legend: {
         display: datasets.length > 1,
         position: "bottom",
+        labels: { fontColor: LEGEND_LABEL_COLOR, fontSize: 13, boxWidth: 14 },
       },
       scales: {
-        xAxes: [{ ticks: { autoSkip: true, maxTicksLimit: 8 } }],
-        yAxes: [{ ticks: { beginAtZero: false } }],
+        xAxes: [
+          {
+            gridLines: { color: GRID_COLOR, zeroLineColor: GRID_COLOR, drawBorder: false },
+            ticks: { autoSkip: true, maxTicksLimit: 8, fontColor: AXIS_LABEL_COLOR },
+          },
+        ],
+        yAxes: [
+          {
+            gridLines: { color: GRID_COLOR, zeroLineColor: GRID_COLOR, drawBorder: false },
+            ticks: { beginAtZero: false, fontColor: AXIS_LABEL_COLOR },
+          },
+        ],
       },
     },
   };
 
   const encoded = encodeURIComponent(JSON.stringify(config));
-  return `https://quickchart.io/chart?c=${encoded}&width=${width}&height=${height}&backgroundColor=white&format=png`;
+  return `https://quickchart.io/chart?c=${encoded}&width=${width}&height=${height}&backgroundColor=${encodeURIComponent(SURFACE)}&format=png`;
 }
