@@ -15,6 +15,22 @@ function formatDateCompact(isoDate, timezone) {
   }).format(new Date(`${isoDate}T00:00:00Z`));
 }
 
+function getYesterdayIso(isoDate) {
+  const date = new Date(`${isoDate}T00:00:00Z`);
+  date.setUTCDate(date.getUTCDate() - 1);
+  return date.toISOString().slice(0, 10);
+}
+
+function formatDateRelative(isoDate, todayIso, timezone) {
+  if (isoDate === todayIso) {
+    return "today";
+  }
+  if (isoDate === getYesterdayIso(todayIso)) {
+    return "yesterday";
+  }
+  return `on ${formatDateCompact(isoDate, timezone)}`;
+}
+
 function formatCurrency(amount) {
   return `₹${new Intl.NumberFormat("en-IN").format(amount)}`;
 }
@@ -101,6 +117,6 @@ export function buildSummary({ currentSnapshot, historyEntries, timezone }) {
     hasFullYearData,
     formatCurrency,
     formatDateShort: (isoDate) => formatDateShort(isoDate, timezone),
-    formatDateCompact: (isoDate) => formatDateCompact(isoDate, timezone),
+    formatDateCompact: (isoDate) => formatDateRelative(isoDate, latest.date, timezone),
   };
 }

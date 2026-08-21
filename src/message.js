@@ -44,14 +44,14 @@ export function buildTelegramMessage(summary) {
     `<b>Yesterday</b>: ${escapeHtml(summary.formatCurrency(summary.yesterdayRate))} / ${summary.grams}g`,
     `${color} <b>Change</b>: ${formatChange(summary)}`,
     "",
-    `<b>${escapeHtml(monthLowLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.monthLow.rate))} on ${escapeHtml(summary.formatDateCompact(summary.monthLow.date))}`,
-    `<b>${escapeHtml(monthHighLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.monthHigh.rate))} on ${escapeHtml(summary.formatDateCompact(summary.monthHigh.date))}`,
+    `<b>${escapeHtml(monthLowLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.monthLow.rate))} ${escapeHtml(summary.formatDateCompact(summary.monthLow.date))}`,
+    `<b>${escapeHtml(monthHighLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.monthHigh.rate))} ${escapeHtml(summary.formatDateCompact(summary.monthHigh.date))}`,
   ];
 
   if (summary.hasFullYearData) {
     const yearHighLabel = summary.yearCoverage ? `Yearly High (${summary.yearCoverage})` : "Yearly High";
     lines.push(
-      `<b>${escapeHtml(yearHighLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.yearHigh.rate))} on ${escapeHtml(summary.formatDateCompact(summary.yearHigh.date))}`,
+      `<b>${escapeHtml(yearHighLabel)}</b>: ${escapeHtml(summary.formatCurrency(summary.yearHigh.rate))} ${escapeHtml(summary.formatDateCompact(summary.yearHigh.date))}`,
     );
   }
 
@@ -76,12 +76,12 @@ export function buildCombinedTelegramMessage(summaries) {
 
   const monthLowLines = summaries.map((s) => {
     const label = s.monthCoverage ? ` (${s.monthCoverage})` : "";
-    return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.monthLow.rate))} on ${escapeHtml(s.formatDateCompact(s.monthLow.date))}${label}`;
+    return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.monthLow.rate))} ${escapeHtml(s.formatDateCompact(s.monthLow.date))}${label}`;
   });
 
   const monthHighLines = summaries.map((s) => {
     const label = s.monthCoverage ? ` (${s.monthCoverage})` : "";
-    return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.monthHigh.rate))} on ${escapeHtml(s.formatDateCompact(s.monthHigh.date))}${label}`;
+    return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.monthHigh.rate))} ${escapeHtml(s.formatDateCompact(s.monthHigh.date))}${label}`;
   });
 
   const showYearData = summaries.some((s) => s.hasFullYearData);
@@ -90,7 +90,7 @@ export function buildCombinedTelegramMessage(summaries) {
         .filter((s) => s.hasFullYearData)
         .map((s) => {
           const label = s.yearCoverage ? ` (${s.yearCoverage})` : "";
-          return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.yearLow.rate))} on ${escapeHtml(s.formatDateCompact(s.yearLow.date))}${label}`;
+          return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.yearLow.rate))} ${escapeHtml(s.formatDateCompact(s.yearLow.date))}${label}`;
         })
     : [];
   const yearHighLines = showYearData
@@ -98,7 +98,7 @@ export function buildCombinedTelegramMessage(summaries) {
         .filter((s) => s.hasFullYearData)
         .map((s) => {
           const label = s.yearCoverage ? ` (${s.yearCoverage})` : "";
-          return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.yearHigh.rate))} on ${escapeHtml(s.formatDateCompact(s.yearHigh.date))}${label}`;
+          return `${s.variant}K: ${escapeHtml(s.formatCurrency(s.yearHigh.rate))} ${escapeHtml(s.formatDateCompact(s.yearHigh.date))}${label}`;
         })
     : [];
 
