@@ -8,7 +8,9 @@ This bot fetches the daily gold rate from Tanishq, compares it with yesterday, c
 - Yesterday's rate
 - Up/down change in rupees and percent
 - Lowest observed rate this month
+- Highest observed rate this month
 - Lowest observed rate this year
+- Highest observed rate this year
 
 The bot uses the official Tanishq gold rate page:
 

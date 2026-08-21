@@ -47,7 +47,9 @@ test("buildSummary computes trend and monthly low", () => {
   assert.equal(summary.trend, "up");
   assert.equal(summary.hasFullYearData, false);
   assert.ok(summary.monthLow);
+  assert.ok(summary.monthHigh);
   assert.ok(summary.yearLow);
+  assert.ok(summary.yearHigh);
 });
 
 test("buildCombinedTelegramMessage shows color circles and rates", () => {
@@ -62,7 +64,8 @@ test("buildCombinedTelegramMessage shows color circles and rates", () => {
   assert.match(message, /🟢/);
   assert.match(message, /22K/);
   assert.match(message, /\+2\.77%/);
-  assert.match(message, /This month/);
-  // Year low hidden until hasFullYearData
+  assert.match(message, /This month's low/);
+  assert.match(message, /This month's high/);
+  // Year low/high hidden until hasFullYearData
   assert.doesNotMatch(message, /This year/);
 });

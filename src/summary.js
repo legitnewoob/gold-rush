@@ -28,6 +28,15 @@ function findLowest(entries) {
   }, null);
 }
 
+function findHighest(entries) {
+  return entries.reduce((highest, entry) => {
+    if (!highest || entry.rate > highest.rate) {
+      return entry;
+    }
+    return highest;
+  }, null);
+}
+
 function sortEntries(entries) {
   return [...entries].sort((left, right) => left.date.localeCompare(right.date));
 }
@@ -62,6 +71,8 @@ export function buildSummary({ currentSnapshot, historyEntries, timezone }) {
   const yearEntries = sorted.filter((entry) => entry.date.startsWith(yearPrefix));
   const monthLow = findLowest(monthEntries);
   const yearLow = findLowest(yearEntries);
+  const monthHigh = findHighest(monthEntries);
+  const yearHigh = findHighest(yearEntries);
 
   const monthStart = `${monthPrefix}-01`;
   const yearStart = `${yearPrefix}-01-01`;
@@ -82,8 +93,10 @@ export function buildSummary({ currentSnapshot, historyEntries, timezone }) {
     deltaPercent,
     trend: delta > 0 ? "up" : delta < 0 ? "down" : "flat",
     monthLow,
+    monthHigh,
     monthCoverage,
     yearLow,
+    yearHigh,
     yearCoverage,
     hasFullYearData,
     formatCurrency,

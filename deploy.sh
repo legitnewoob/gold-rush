@@ -7,7 +7,7 @@ echo "==> Pulling latest changes..."
 git pull
 
 echo "==> Building image..."
-docker compose build --no-cache
+docker compose build
 
 echo "==> Restarting container..."
 docker compose up -d --force-recreate "$COMPOSE_SERVICE"
