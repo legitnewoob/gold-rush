@@ -5,13 +5,15 @@ Scrapes current gold rates and the recent rate-history table from
 https://www.tanishq.co.in/gold-rate.html
 
 Usage:
-    pip install requests beautifulsoup4 lxml
+    pip install curl_cffi beautifulsoup4 lxml
     python tanishq_gold_scraper.py
 
 Notes:
 - The page is server-rendered (Salesforce Commerce Cloud / SFRA storefront),
-  so a plain requests.get() returns the fully populated HTML — no need for
-  Selenium/Playwright.
+  so a GET request returns the fully populated HTML — no need for
+  Selenium/Playwright. Tanishq's WAF blocks plain requests/curl by TLS
+  fingerprint regardless of headers, so curl_cffi (impersonate="chrome")
+  is used instead of the `requests` library.
 - Be a good citizen: don't hammer the site. This script makes ONE request.
   If you plan to poll regularly, cache results and check for a public API
   before scraping repeatedly, and respect robots.txt / their ToS.
@@ -24,17 +26,12 @@ import time
 import csv
 from datetime import datetime, timezone
 
-import requests
+from curl_cffi import requests
 from bs4 import BeautifulSoup
 
 URL = "https://www.tanishq.co.in/gold-rate.html?lang=en_IN"
 
 HEADERS = {
-    # A realistic UA avoids some basic bot-blocking. Swap in your own if this gets blocked.
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/124.0 Safari/537.36"
-    ),
     "Accept-Language": "en-IN,en;q=0.9",
 }
 
@@ -43,7 +40,9 @@ def fetch_page(url: str, retries: int = 3, backoff: float = 2.0) -> str:
     last_exc = None
     for attempt in range(1, retries + 1):
         try:
-            resp = requests.get(url, headers=HEADERS, timeout=15)
+            # impersonate="chrome" matches a real Chrome TLS/HTTP2 fingerprint —
+            # Tanishq's WAF 403s plain requests/curl regardless of headers sent.
+            resp = requests.get(url, headers=HEADERS, timeout=15, impersonate="chrome")
             resp.raise_for_status()
             return resp.text
         except requests.RequestException as e:
